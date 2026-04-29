@@ -15,12 +15,16 @@ const threeMostRecentInternships = mostRecentInternships.data.slice(0, 3);
           href={`/internships/${internship.id}`}
           class="flex flex-row items-center justify-between bg-light-neutral rounded-xl p-5 border border-white/20! hover:bg-neutral transition-all"
         >
-          <div>
-            <span class="font-semibold">{internship.position}</span>
-            <div class="font-light text-sm">
-              <span class="text-light-text/75">
-                {internship.company.name} • {internship.city}
-              </span>
+          <div class="flex flex-row items-center gap-5">
+            <div class="w-1 h-1 p-1 rounded-full bg-primary-hover" />
+
+            <div>
+              <span class="font-semibold line-clamp-1">{internship.position}</span>
+              <div class="font-light text-sm">
+                <span class="text-light-text/75">
+                  {internship.company.name} • {internship.city}
+                </span>
+              </div>
             </div>
           </div>
           <ArrowUpRight />
