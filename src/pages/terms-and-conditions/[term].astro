@@ -13,10 +13,12 @@ const { content, title, id } = page;
 <TermsLayout>
   <section class="bg-light-neutral p-10 rounded-xl">
     <h2 class="title-lg">{id}. {title}</h2>
-    <div>
-      <p class="text-text max-w-prose">
-        {content}
-      </p>
+    <div class="flex flex-col gap-4">
+      {
+        content.map((paragraph) => (
+          <p class="text-text max-w-prose">{paragraph}</p>
+        ))
+      }
     </div>
   </section>
 </TermsLayout>
