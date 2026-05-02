@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import CollapsibleIndex from "@/components/termsAndConditions/collapsibleIndex";
+import IndexSkeleton from "@/components/termsAndConditions/indexSkeleton.astro";
 
 const PREFIX = "/terminos-y-condiciones/";
 const pathname = Astro.originPathname;
@@ -11,12 +12,19 @@ const currentURI = pathname.split("/").at(2) ?? "";
   title="Términos y Condiciones | BuscoPasantías"
   description="Términos y condiciones de uso de la aplicación BuscoPasantías"
 >
-  <main
-    class="container flex flex-col md:flex-row gap-5 leading-relaxed w-full mb-10 mt-10"
-  >
-    <CollapsibleIndex prefix={PREFIX} currentURI={currentURI} client:only>
-      <div class="bg-light-neutral rounded-xl w-80" slot="fallback"></div>
+  <main class="container grid grid-cols-1 md:grid-cols-4 gap-5 leading-relaxed w-full mb-10 mt-10">
+    <CollapsibleIndex
+      prefix={PREFIX}
+      currentURI={currentURI}
+      client:only
+    >
+      <IndexSkeleton
+        slot="fallback"
+        items={10}
+      />
     </CollapsibleIndex>
-    <slot />
+    <div class="md:col-span-3">
+      <slot />
+    </div>
   </main>
 </Layout>

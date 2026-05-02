@@ -1,0 +1,14 @@
+---
+interface Props {
+  items?: number;
+}
+
+const { items = 3 } = Astro.props as Props;
+---
+
+<div class="flex flex-col gap-5">
+  <div class="flex md:hidden w-36 h-9 rounded-full bg-light-neutral animate-pulse"></div>
+  <div class="hidden md:flex bg-light-neutral animate-pulse rounded-xl w-full h-fit p-10 flex-col gap-2 md:gap-5">
+    {new Array(items).fill(undefined).map(() => <div class="w-full h-4 bg-skeleton animate-pulse rounded-md" />)}
+  </div>
+</div>
