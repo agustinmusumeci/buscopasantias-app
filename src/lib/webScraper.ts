@@ -14,7 +14,8 @@ export class WebScraper {
         headless: headless,
       };
 
-    if (JSON.parse(isVercel)) {
+    if (isVercel) {
+      // Production
       // Vercel: Use puppeteer-core with downloaded Chromium binary
       const chromium = (await import("@sparticuz/chromium")).default;
       puppeteer = await import("puppeteer-core");
@@ -27,6 +28,7 @@ export class WebScraper {
         executablePath,
       };
     } else {
+      // Development
       // Local: Use regular puppeteer with bundled Chromium
       puppeteer = await import("puppeteer");
     }
