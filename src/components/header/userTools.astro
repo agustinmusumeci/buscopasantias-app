@@ -1,12 +1,7 @@
 ---
 import { UserService } from "@/services/user.service";
 import { MAXIMUM_DISPLAY_NOTIFICATIONS } from "../../constants/notifications";
-import {
-  Show,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/astro/components";
+import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/astro/components";
 import { Bell, Bookmark } from "@lucide/astro";
 
 const user = await Astro.locals.currentUser();
@@ -23,7 +18,10 @@ if (user) {
 <div class="flex flex-row gap-4 items-center">
   <Show when="signed-out">
     <div class="hidden md:flex flex-row gap-3">
-      <SignInButton class:list="button button-outline" mode="modal">
+      <SignInButton
+        class:list="button button-outline"
+        mode="modal"
+      >
         Inicia Sesión
       </SignInButton>
 
@@ -39,15 +37,14 @@ if (user) {
     <a href="/pasantias/guardadas">
       <Bookmark />
     </a>
-    <a href="/alertas" class="relative">
+    <a
+      href="/alertas"
+      class="relative"
+    >
       <Bell />
       {
         notifications > 0 && (
-          <span class="absolute -bottom-2 -left-3 border-2 border-neutral text-xs bg-red-900 px-1.5 py-0.5 rounded-full">
-            {notifications > MAXIMUM_DISPLAY_NOTIFICATIONS
-              ? "+9"
-              : notifications}
-          </span>
+          <span class="absolute -bottom-2 -left-3 border-2 border-neutral text-xs bg-red-900 px-2 py-0.5 rounded-full">{notifications > MAXIMUM_DISPLAY_NOTIFICATIONS ? "+9" : notifications}</span>
         )
       }
     </a>
@@ -62,30 +59,50 @@ if (user) {
       class="p-2 rounded-md cursor-pointer flex items-center"
       aria-label="Abrir menú"
     >
-      <span class="hamburger" aria-hidden="true">
+      <span
+        class="hamburger"
+        aria-hidden="true"
+      >
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
       </span>
     </summary>
-    <div
-      class="absolute right-0 mt-2 w-64 bg-light-neutral text-text dark:text-neutral-100 rounded shadow-lg z-50"
-    >
+    <div class="absolute right-0 mt-2 w-64 bg-light-neutral text-text dark:text-neutral-100 rounded shadow-lg z-50">
       <nav class="flex flex-col p-3 gap-2">
-        <a href="/" class="nav-link">Inicio</a>
-        <a href="/pasantias" class="nav-link">Pasantías</a>
-        <a href="/acerca" class="nav-link">Acerca</a>
-        <a href="/terminos-y-condiciones" class="nav-link">Términos</a>
+        <a
+          href="/"
+          class="nav-link"
+          >Inicio</a
+        >
+        <a
+          href="/pasantias"
+          class="nav-link"
+          >Pasantías</a
+        >
+        <a
+          href="/acerca"
+          class="nav-link"
+          >Acerca</a
+        >
+        <a
+          href="/terminos-y-condiciones"
+          class="nav-link"
+          >Términos</a
+        >
 
         <hr class="my-2 text-light-text/50" />
         <Show when="signed-out">
           <div class="flex flex-col gap-2">
-            <SignInButton class:list="button button-outline w-full" mode="modal"
+            <SignInButton
+              class:list="button button-outline w-full"
+              mode="modal"
               >Inicia Sesión</SignInButton
             >
             <SignUpButton
               class:list="button button-white bg-text/95 text-neutral rounded-full w-full"
-              mode="modal">Registrate</SignUpButton
+              mode="modal"
+              >Registrate</SignUpButton
             >
           </div>
         </Show>

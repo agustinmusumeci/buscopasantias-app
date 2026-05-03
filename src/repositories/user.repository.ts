@@ -25,7 +25,7 @@ export class UserRepository {
   async getUserNotifications(userId: string) {
     return await prisma.userNotification.findMany({
       where: { user_id: userId, seen: false },
-      include: { Internship: { include: { internshipCareers: { include: { Career: true } } } } },
+      include: { Internship: { include: { internshipCareers: { include: { Career: true } }, Company: true } } },
       orderBy: { Internship: { created_at: "desc" } },
     });
   }

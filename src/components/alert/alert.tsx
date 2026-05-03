@@ -5,13 +5,14 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import Warning from "../ui/warning";
-import { ArrowUpRight, BellRing, CheckCheck, CirclePlusIcon, CircleX, Info, KeyRound, LoaderIcon, UniversityIcon } from "lucide-react";
+import { ArrowUpRight, BellRing, CheckCheck, CircleDollarSign, CirclePlusIcon, CircleX, House, Info, KeyRound, LoaderIcon, UniversityIcon } from "lucide-react";
 import alertasNotFound from "../../../public/images/alertas-notfound.png";
 import PageTitle from "../ui/page-title";
 import Careers from "../career/careers";
 
 export default function Alert({ user, internships = [] }: { user: any; internships: any[] }) {
   // Parse all the careers and suscripted careers
+
   const careers = UNIVERSITIES_CAREERS.flatMap((u) => u.careers);
   const userCareersIds = new Set(user ? user?.careers?.map((c: { id: string }) => c?.id) : []);
 
@@ -272,19 +273,29 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
               {alertedInternships?.map((internship) => (
                 <div
                   key={internship.internship.id}
-                  className="relative flex flex-col gap-5 bg-light-neutral text-text/75 p-5 min-w-100 h-fit rounded-xl"
+                  className="relative flex flex-col gap-5 bg-light-neutral text-text/75 p-5 min-w-100 h-65 rounded-xl"
                 >
                   <div>
                     <a
                       href={`/pasantias/${internship.internship.id}`}
                       className="relative flex flex-row justify-between items-start gap-10 hover:underline hover:text-primary-hover transition-all mt-5"
                     >
-                      <div className="flex flex-row gap-5 items-center mb-10 overflow-hidden w-full grow">
+                      <div className="flex flex-row gap-5 items-center overflow-hidden w-full grow">
                         <div className="w-1 h-1 p-1 rounded-full bg-primary-hover"></div>
                         <h4 className="font-semibold text-lg truncate line-clamp-1">{internship.internship.position}</h4>
                       </div>
                       <ArrowUpRight className="w-fit h-7" />
                     </a>
+                  </div>
+                  <div className="flex flex-col gap-2 mb-9">
+                    <p className="flex flex-row gap-2 items-center">
+                      <House className="text-text/50 w-4" />
+                      {internship.internship.company.name}
+                    </p>
+                    <p className="flex flex-row gap-2 items-center">
+                      <CircleDollarSign className="text-text/50 w-4" />
+                      {typeof internship?.internship?.payment === "number" ? `$${internship?.internship?.payment?.toLocaleString()}` : internship.internship.payment}
+                    </p>
                   </div>
                   <div>
                     <div className="flex flex-row gap-3"></div>
