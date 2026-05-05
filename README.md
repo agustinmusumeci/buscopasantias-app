@@ -4,9 +4,20 @@
 
 # BuscoPasantías App
 
-Web app built w/Astro & Prisma for browsing and tracking internship listings, with email notifications for users when a new listing matches their interests.
+**Busco Pasantías** is a web app built in w/Astro & Prisma that centralizes and tracks internship listings from multiple universities, making it easier for students to find opportunities that match their profile and get notified when new ones appear.
 
 </div>
+
+## 📖 Essential Documentation
+
+All users that want to contribute should be aware and familiar with:
+
+- Project DB structure
+- Project architecture and flow
+- Project ETL System
+- License
+
+The documentation can be found in `/docs`
 
 ## 🚀 Project structure
 
@@ -81,7 +92,7 @@ Web app built w/Astro & Prisma for browsing and tracking internship listings, wi
 | Gemini Agent                 | Data processing of scraped data | Gemini 2.5 Flash |
 | Clerk (as Astro integration) | Auth and user handling          | ^3.0.6           |
 
-## Enviroment Variables
+## 💻 Enviroment Variables
 
 | Var                          | Description                                                              | Usage            |
 | ---------------------------- | ------------------------------------------------------------------------ | ---------------- |
