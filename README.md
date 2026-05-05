@@ -1,10 +1,10 @@
 <div align="center">
 
-<!-- ![GithubImage](https://github.com/agustinmusumeci/agustinmusumeci/blob/main/GithubProfileImage.png?raw=true "Title") -->
+<a href="https://www.fifa.com" target="_blank" title="Go to FIFA website"><img width="100px" alt="fifa logo" src="https://www.buscopasantias.com.ar/icons/favicon.svg"></a>
 
 # BuscoPasantías App
 
-Web App w/Astro & Prisma for looking into the internships of Universidad Tecnológica Nacional FRC, and more in the future, and notifying the subscription users in case of intertest match.
+Web app built w/Astro & Prisma for browsing and tracking internship listings, with email notifications for users when a new listing matches their interests.
 
 </div>
 
@@ -22,7 +22,6 @@ Web App w/Astro & Prisma for looking into the internships of Universidad Tecnol�
 ├── src
 │   ├── actions/
 │   ├── agents/
-│   ├── assets/
 │   ├── components/
 │   ├── constants/
 │   ├── hooks/
@@ -33,17 +32,24 @@ Web App w/Astro & Prisma for looking into the internships of Universidad Tecnol�
 │   ├── mock/
 │   ├── pages/
 │   │   ├── index.astro
-│   │   ├── internships/
+│   │   ├── acerca.astro
+│   │   ├── 404.astro
+│   │   ├── pasantias/
 │   │   │   ├── [id].astro
 │   │   │   └── index.astro
-│   │   ├── alerts/
+│   │   ├── alertas/
 │   │   │   └── index.astro
+│   │   ├── terminos-y-condiciones/
+│   │   │   ├── [term].astro
+│   │   │   ├── index.astro
+│   │   │   └── termsLayout.astro
 │   │   └── api/
 │   │       └── cron/
 │   │           └── index.ts
 │   │
 │   ├── schemas/
 │   ├── styles/
+│   ├── tests/
 │   ├── templates/
 │   ├── utils/
 │   ├── controllers/
