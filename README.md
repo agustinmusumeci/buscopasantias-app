@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://www.fifa.com" target="_blank" title="Go to FIFA website"><img width="100px" alt="fifa logo" src="https://www.buscopasantias.com.ar/icons/favicon.svg"></a>
+<a href="https://buscopasantias.com.ar" target="_blank" title="Go to BuscoPasantias"><img width="100px" alt="buscopasantias logo" src="https://www.buscopasantias.com.ar/icons/favicon.svg"></a>
 
 # BuscoPasantías App
 
