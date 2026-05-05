@@ -17,7 +17,7 @@ export default function getContext(university: string) {
     READ all the text and fields of an internship an try to match it to any of the following fields.
 
     - "A.R.M. XX/XX" → arm (string, e.g. "28/26")
-    - Company name → company_id (uppercase, no accents, no special characters, only alphanumeric)
+    - Company name → company_id (uppercase, no accents, no special characters, only alphanumeric or whitespaces)
     - City → city
     - "REFERENTE DE RRHH" → rrhh
     - "HORARIO PARA ENTREVISTA" → interview_timetable
