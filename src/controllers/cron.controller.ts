@@ -55,12 +55,16 @@ export class CronController {
       for (const user of suscriptedUsers) {
         toNotify[user?.id] = { domain: user.mail, username: user.name, internships: new Set() };
 
-        const userSuscriptedCareers = new Set(
-          user?.careers?.map((c: any) => {
-            return c?.id;
-          }),
-        );
+        const userSuscriptedCareers = new Set<string>();
 
+        // Iterate through the universities and extract all the careers the user is suscripted to
+        for (const university of user.careers) {
+          for (const career of university.careers) {
+            userSuscriptedCareers.add(career.id);
+          }
+        }
+
+        // Look for matches between the new careers and the ones that the user is intersted at
         for (const internship of internships) {
           const internshipCareers = new Set(internship.careers);
 
@@ -72,6 +76,7 @@ export class CronController {
         }
       }
 
+      // Create all the notifications
       const arrayToNotify = Object.entries(toNotify).map(([key, value]) => {
         return { userId: key, domain: value.domain, username: value.username, internships: Array.from(value.internships).map(String) };
       });

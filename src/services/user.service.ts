@@ -162,18 +162,18 @@ export class UserService {
     >();
 
     for (const { Career } of user?.userCareers) {
-      for (const { University } of Career.universityCareers) {
-        if (!universitiesMap.has(University.id)) {
-          universitiesMap.set(University.id, {
+      for (const { University } of Career?.universityCareers) {
+        if (!universitiesMap.has(University?.id)) {
+          universitiesMap.set(University?.id, {
             university: University,
             careers: [],
           });
         }
         universitiesMap.get(University.id)!.careers.push({
-          id: Career.id,
-          name: Career.name,
-          color: Career.color,
-          bg: Career.bg,
+          id: Career?.id,
+          name: Career?.name,
+          color: Career?.color,
+          bg: Career?.bg,
         });
       }
     }
