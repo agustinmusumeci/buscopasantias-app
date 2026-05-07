@@ -2,9 +2,10 @@ import { UserService } from "@/services/user.service";
 import { NotificationService } from "../services/notification.service";
 import { UploadController } from "./upload.controller";
 import extractKeywords from "@/utils/extractKeywords";
+import type { Internship } from "prisma/zod";
 
 export class CronController {
-  async cron() {
+  async getInternships() {
     try {
       // Scrape internships
       const uploader = new UploadController();
@@ -19,30 +20,7 @@ export class CronController {
         return;
       }
 
-      const careersSet: Set<string> = new Set();
-      const keywordsSet: Set<string> = new Set();
-
-      // Fields where to look for keywords
-      const fieldsToAnalyze = ["knowledge", "requirements", "position"];
-
-      // Analize the new internships
-      for (const internship of internships) {
-        const careers = internship?.careers ?? [];
-
-        // Extract the keywords
-        for (const field of fieldsToAnalyze) {
-          const keywords = extractKeywords(internship[`${field}`]);
-
-          for (const keyword of keywords) {
-            keywordsSet.add(keyword);
-          }
-        }
-
-        // Extract the career
-        for (const careear of careers) {
-          careersSet.add(careear);
-        }
-      }
+      const { careersSet, keywordsSet } = this.getInternshipsCareersAndKeywords(internships);
 
       // Get users that are suscripted to the careers or keywords of the newest internships
       const careers = Array.from(careersSet);
@@ -97,5 +75,36 @@ export class CronController {
       console.error(e);
       throw e;
     }
+  }
+
+  getInternshipsCareersAndKeywords(internships: Array<Internship & { careers: Array<string> }>) {
+    const careersSet: Set<string> = new Set();
+    const keywordsSet: Set<string> = new Set();
+
+    // Fields where to look for keywords
+    const fieldsToAnalyze = ["knowledge", "requirements", "position"] as const;
+
+    type AnalyzeField = (typeof fieldsToAnalyze)[number];
+
+    // Analize the new internships
+    for (const internship of internships) {
+      const careers = internship?.careers ?? [];
+
+      // Extract the keywords
+      for (const field of fieldsToAnalyze) {
+        const keywords = extractKeywords(internship[`${field}` as AnalyzeField]);
+
+        for (const keyword of keywords) {
+          keywordsSet.add(keyword);
+        }
+      }
+
+      // Extract the career
+      for (const careear of careers) {
+        careersSet.add(careear);
+      }
+    }
+
+    return { careersSet, keywordsSet };
   }
 }

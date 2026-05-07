@@ -14,7 +14,7 @@ export async function GET({ params, request }: { params: Record<string, string>;
   const cronController = new CronController();
 
   const { ok, error } = await cronController
-    .cron()
+    .getInternships()
     .then(() => {
       return { ok: true, error: null };
     })
