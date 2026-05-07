@@ -152,17 +152,38 @@ export class UserService {
   }
 
   mapUserToJson(user: User & { userCareers?: Array<any>; userKeywords: Array<any> }) {
+    // Group careers based on its university
+    const universitiesMap = new Map<
+      string,
+      {
+        university: { id: string; name: string };
+        careers: { id: string; name: string; color: string; bg: string }[];
+      }
+    >();
+
+    for (const { Career } of user?.userCareers) {
+      for (const { University } of Career.universityCareers) {
+        if (!universitiesMap.has(University.id)) {
+          universitiesMap.set(University.id, {
+            university: University,
+            careers: [],
+          });
+        }
+        universitiesMap.get(University.id)!.careers.push({
+          id: Career.id,
+          name: Career.name,
+          color: Career.color,
+          bg: Career.bg,
+        });
+      }
+    }
+
     const newUser = {
       id: user?.id,
       name: user?.name,
       mail: user?.mail,
       suscripted: user?.suscripted,
-      careers:
-        user?.userCareers?.map((career) => ({
-          id: career?.career_id,
-          name: career?.Career?.name,
-          color: career?.Career?.color,
-        })) ?? [],
+      careers: Array.from(universitiesMap.values()),
       keywords:
         user?.userKeywords?.map((keyword) => {
           return keyword?.keyword;

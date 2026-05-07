@@ -9,17 +9,29 @@ export class UserRepository {
   }
 
   async getUser(userId: string) {
-    return await prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: { id: userId },
       include: {
         userCareers: {
           include: {
-            Career: true,
+            Career: {
+              include: {
+                universityCareers: {
+                  include: {
+                    University: true,
+                  },
+                },
+              },
+            },
           },
         },
         userKeywords: true,
       },
     });
+
+    if (!user) return null;
+
+    return user;
   }
 
   async getUserNotifications(userId: string) {

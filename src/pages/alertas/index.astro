@@ -4,24 +4,34 @@ import Alert from "../../components/alert/alert";
 import { UserService } from "@/services/user.service";
 import PageTitle from "@/components/ui/page-title";
 
-const { isAuthenticated} = Astro.locals.auth()
-const loggedUser = await Astro.locals.currentUser()
+const { isAuthenticated } = Astro.locals.auth();
+const loggedUser = await Astro.locals.currentUser();
 
 if (!loggedUser || !isAuthenticated) {
-    Astro.redirect("/")
+  Astro.redirect("/");
 }
 
-const userService = new UserService()
+const userService = new UserService();
 
-const userId = loggedUser?.id ?? undefined
-const user = await userService.getUser(userId)
-const internships = await userService.getUserNotifications(userId)
+const userId = loggedUser?.id ?? undefined;
+const user = await userService.getUser(userId);
+const internships = await userService.getUserNotifications(userId);
 ---
 
-<Layout title="Alertas | BuscoPasantías" description="Personaliza tus preferencias para recibir alertas acorde a vos!">
-    <section class="container mt-5">
-        <PageTitle title="Alertas" description="Explore sus alertas de pasantías y customice preferencias para alertas personalizadas." />
+<Layout
+  title="Alertas | BuscoPasantías"
+  description="Personaliza tus preferencias para recibir alertas acorde a vos!"
+>
+  <section class="container mt-5">
+    <PageTitle
+      title="Alertas"
+      description="Explore sus alertas de pasantías y customice preferencias para alertas personalizadas."
+    />
 
-        <Alert user={user} internships={internships} client:load/>
-    </section>
+    <Alert
+      user={user}
+      internships={internships}
+      client:load
+    />
+  </section>
 </Layout>

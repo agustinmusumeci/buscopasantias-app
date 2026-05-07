@@ -5,25 +5,32 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import Warning from "../ui/warning";
+
 import { ArrowUpRight, BellRing, CheckCheck, CircleDollarSign, CirclePlusIcon, CircleX, House, Info, KeyRound, LoaderIcon, UniversityIcon } from "lucide-react";
 import alertasNotFound from "../../../public/images/alertas-notfound.png";
 import PageTitle from "../ui/page-title";
 import Careers from "../career/careers";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
+// I hate my life :D
 export default function Alert({ user, internships = [] }: { user: any; internships: any[] }) {
-  // Parse all the careers and suscripted careers
-
-  const careers = UNIVERSITIES_CAREERS.flatMap((u) => u.careers);
-  const userCareersIds = new Set(user ? user?.careers?.map((c: { id: string }) => c?.id) : []);
+  const universitiesCareersHashMap = Object.fromEntries(
+    user.careers.map(({ university, careers }: { university: { id: string; name: string }; careers: Array<{ id: string }> }) => [university.id, new Set(careers?.map((c) => c.id))]),
+  );
 
   const [suscripted, setSuscripted] = useState(user?.suscripted ?? false);
 
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [alertedInternships, setAlertedInternships] = useState(internships ?? []);
-  const [availableCareers, setAvailableCareers] = useState(careers.filter((career) => !userCareersIds.has(career?.id)) ?? []);
+  const [availableUniversitiesCareers, setAvailableUniversitiesCareers] = useState(
+    UNIVERSITIES_CAREERS.map((university) => {
+      const careers = university.careers.filter((career) => !universitiesCareersHashMap[university.id]?.has(career.id));
+      return { ...university, careers };
+    }) ?? [],
+  );
 
-  const [suscriptedCareers, setSuscriptedCareers] = useState(user?.careers ?? []);
+  const [suscriptedUniversitiesCareers, setSuscriptedUniversitiesCareers] = useState(user?.careers ?? []);
   const [toDeleteCareers, setToDeleteCareers] = useState<Array<{ id: string; name: string; color: string; bg: string }>>([]);
   const [suscriptedKeywords, setSuscriptedKeywords] = useState(user?.keywords ?? []);
   const [toDeleteKeywords, setToDeleteKeywords] = useState<Array<string>>([]);
@@ -70,10 +77,18 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
     e.preventDefault();
     setLoading(true);
 
+    const toSuscriptCareers: Array<string> = [];
+
+    suscriptedUniversitiesCareers.forEach((el: any) => {
+      el?.careers?.forEach((career: any) => {
+        toSuscriptCareers.push(career?.id);
+      });
+    });
+
     const [{ data: careersData, error: careersError }, { data: keywordsData, error: keywordsError }] = await Promise.all([
       actions.suscribeCareers({
         id: user?.id,
-        toSuscribeCareers: suscriptedCareers.map((c: { id: string }) => c?.id),
+        toSuscribeCareers: toSuscriptCareers,
         toDeleteCareers: toDeleteCareers.map((c: { id: string }) => c?.id),
       }),
       actions.suscribeKeywords({ id: user?.id, toSuscribeKeywords: suscriptedKeywords, toDeleteKeywords: toDeleteKeywords }),
@@ -119,23 +134,85 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
   };
 
   const handleDiscardChanges = async () => {
-    setSuscriptedCareers(user?.careers ?? []);
+    setSuscriptedUniversitiesCareers(user?.careers ?? []);
+    setAvailableUniversitiesCareers(
+      UNIVERSITIES_CAREERS.map((university) => {
+        const careers = university.careers.filter((career) => !universitiesCareersHashMap[university.id]?.has(career.id));
+        return { ...university, careers };
+      }) ?? [],
+    );
     setSuscriptedKeywords(user?.keywords ?? []);
     setToDeleteCareers([]);
     setToDeleteKeywords([]);
   };
 
-  const suscriptCareer = (careerId: string, suscript: boolean) => {
-    const career = careers.find((c) => c.id === careerId);
-    if (!career) return;
+  const suscriptCareer = (universityId: string, careerId: string, suscript: boolean) => {
+    const university = suscriptedUniversitiesCareers.find((data: { university: { id: string; name: string }; careers: Array<{ id: string; name: string }> }) => data.university.id === universityId);
+    const career = UNIVERSITIES_CAREERS.find((u) => u.id === universityId)?.careers.find((c) => c.id === careerId);
 
+    // If the action is suscribe
     if (suscript) {
-      setSuscriptedCareers([...suscriptedCareers, career]);
-      setAvailableCareers(availableCareers.filter((c) => c.id !== careerId));
+      // Remove the new careers from the delete state in case its present there
+      setToDeleteCareers((prev: any) => prev.filter((c: any) => !(c.id === careerId)));
+
+      if (university) {
+        // Update the careers that the user are suscripted to
+        const updatedSuscripteUnivertiesCareers = suscriptedUniversitiesCareers.map((u: any) => {
+          if (u.university.id !== universityId) return u;
+
+          const updatedUniversity = u;
+          updatedUniversity.careers.push(career);
+
+          return updatedUniversity;
+        });
+        setSuscriptedUniversitiesCareers(updatedSuscripteUnivertiesCareers);
+      } else {
+        const newUniversity = UNIVERSITIES_CAREERS.find((u) => u.id === universityId);
+        setSuscriptedUniversitiesCareers((prev: any) => [...prev, { university: { id: newUniversity?.id, name: newUniversity?.name }, careers: [career] }]);
+      }
+
+      // Update the careers that are available to be suscripted
+      setAvailableUniversitiesCareers(
+        availableUniversitiesCareers.map((el: any) => {
+          if (el.id !== universityId) return el; // ✅ skip universities that don't match
+
+          return {
+            ...el,
+            careers: el.careers.filter((c: any) => c.id !== careerId),
+          };
+        }),
+      );
+
+      // If the action is delete suscription
     } else {
-      setSuscriptedCareers(suscriptedCareers.filter((c: { id: string }) => c.id !== careerId));
-      setAvailableCareers([...availableCareers, career]);
-      setToDeleteCareers([...toDeleteCareers, career]);
+      // Remove the careers from the suscripted ones
+      setSuscriptedUniversitiesCareers(
+        suscriptedUniversitiesCareers
+          .map((u: any) => {
+            if (u.university.id !== universityId) return u;
+
+            return {
+              ...u,
+              careers: u.careers.filter((c: any) => c.id !== careerId),
+            };
+          })
+          // If the university ran out of careers, remove it from the array
+          .filter((u: any) => u.careers.length > 0),
+      );
+
+      // Return the career to the available ones
+      setAvailableUniversitiesCareers(
+        availableUniversitiesCareers.map((u: any) => {
+          if (u.id !== universityId) return u;
+
+          return {
+            ...u,
+            careers: [...u.careers, career],
+          };
+        }),
+      );
+
+      setToDeleteCareers((prev: any) => [...prev, { id: careerId }]);
     }
   };
 
@@ -364,23 +441,45 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
 
                       <h4>Disponibles</h4>
                     </div>
-                    <ScrollArea className="h-70">
-                      {availableCareers.map((career) => (
-                        <button
-                          onClick={() => {
-                            suscriptCareer(career.id, true);
-                          }}
-                          disabled={!suscripted}
-                          key={`available-careers-${career?.id}`}
-                          aria-disabled={!suscripted}
-                          className="w-full mb-2 group flex flex-row gap-3 justify-between odd:bg-light-neutral even:bg-light-neutral/30 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
-                          style={{ color: `${career.color}` }}
+                    <ScrollArea className="h-70 w-full">
+                      {availableUniversitiesCareers.map((university) => (
+                        <Accordion
+                          className="w-full mb-2 flex flex-row gap-3 justify-between bg-light-neutral  items-center px-5 py-4 rounded-lg cursor-pointer"
+                          type="single"
+                          collapsible
+                          key={university?.id}
                         >
-                          <span>{career.name}</span>
-                          <span className="text-xl text-text/20 group-hover:text-primary-hover transition-all">
-                            <CirclePlusIcon />
-                          </span>
-                        </button>
+                          <AccordionItem
+                            value="careers"
+                            className="w-full"
+                          >
+                            <AccordionTrigger className="max-w-full!">
+                              <div className="flex flex-row items-center  justify-between w-full">
+                                <span>{university?.name}</span>
+                                <span className="bg-neutral px-2 py-1 rounded-full">{university?.careers?.length}</span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="horizontal-scroll!">
+                              {university?.careers.map((career) => (
+                                <button
+                                  onClick={() => {
+                                    suscriptCareer(university?.id, career?.id, true);
+                                  }}
+                                  disabled={!suscripted}
+                                  key={`available-careers-${career?.id}`}
+                                  aria-disabled={!suscripted}
+                                  className="w-full mb-2 group flex flex-row gap-3 justify-between odd:bg-neutral/50 even:bg-neutral/25 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
+                                  style={{ color: `${career?.color}` }}
+                                >
+                                  <span>{career?.name}</span>
+                                  <span className="text-xl text-text/20 group-hover:text-primary-hover transition-all">
+                                    <CirclePlusIcon />
+                                  </span>
+                                </button>
+                              ))}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       ))}
                     </ScrollArea>
                   </div>
@@ -396,22 +495,46 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                       <h4>Suscriptas</h4>
                     </div>
                     <ScrollArea className="flex flex-col gap-2 h-70">
-                      {suscriptedCareers.map((career: { id: string; color: string; name: string; bg: string }) => (
-                        <button
-                          aria-disabled={!suscripted}
-                          onClick={() => {
-                            suscriptCareer(career.id, false);
-                          }}
-                          key={`suscripted-careers-${career?.id}`}
-                          className="w-full mb-2 group flex flex-row gap-3 justify-between bg-[#292929]/50  hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer relative before:absolute before:h-full before:w-1 before:bg-primary before:left-0 before:rounded-bl-full before:rounded-tl-full"
+                      {suscriptedUniversitiesCareers?.map((el: { university: { id: string; name: string }; careers: Array<{ id: string; name: string; color: string; bg: string }> }) => (
+                        <Accordion
+                          className="w-full mb-2 flex flex-row gap-3 justify-between bg-light-neutral  items-center px-5 py-4 rounded-lg cursor-pointer"
+                          type="single"
+                          collapsible
+                          key={`suscripted-universities-${el?.university?.id}`}
                         >
-                          <span style={{ color: `${career.color}` }}>{career.name}</span>
-                          <span className="text-xl text-text/20 group-hover:text-red-800 transition-all">
-                            <CircleX />
-                          </span>
-                        </button>
+                          <AccordionItem
+                            value="careers"
+                            className="w-full"
+                          >
+                            <AccordionTrigger className="max-w-full!">
+                              <div className="flex flex-row items-center  justify-between w-full">
+                                <span>{el?.university?.name}</span>
+                                <span className="bg-neutral px-2 py-1 rounded-full">{el.careers.length}</span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="horizontal-scroll!">
+                              {el.careers.map((career) => (
+                                <button
+                                  onClick={() => {
+                                    suscriptCareer(el.university.id, career.id, false);
+                                  }}
+                                  disabled={!suscripted}
+                                  key={`suscripted-careers-${career?.id}`}
+                                  aria-disabled={!suscripted}
+                                  className="w-full mb-2 group flex flex-row gap-3 justify-between odd:bg-neutral/50 even:bg-neutral/25 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
+                                  style={{ color: `${career.color}` }}
+                                >
+                                  <span>{career.name}</span>
+                                  <span className="text-xl text-text/20 group-hover:text-red-800 transition-all">
+                                    <CircleX />
+                                  </span>
+                                </button>
+                              ))}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       ))}
-                      {suscriptedCareers.length === 0 && (
+                      {suscriptedUniversitiesCareers?.length === 0 && (
                         <span className="group flex flex-row gap-3 justify-between odd:bg-neutral items-center px-5 py-4 rounded-lg cursor-pointer border-text/20 border-2 border-dotted">
                           <span className="flex flex-row gap-5 text-xl text-text/40 items-center">
                             <CirclePlusIcon />
