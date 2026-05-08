@@ -2,7 +2,7 @@ import { UserService } from "@/services/user.service";
 import { NotificationService } from "../services/notification.service";
 import { UploadController } from "./upload.controller";
 import extractKeywords from "@/utils/extractKeywords";
-import type { Internship } from "prisma/zod";
+import type { Internship, User } from "prisma/zod";
 
 export class CronController {
   async getInternships() {
@@ -27,45 +27,15 @@ export class CronController {
       const keywords = Array.from(keywordsSet);
       const suscriptedUsers = await userService.getSuscriptedUsers(careers, keywords);
 
-      // Associate suscripted users with all the internships that matches and need notification
-      const toNotify = {} as { [key: string]: { domain: string; username: string; internships: Set<number> } };
-
-      for (const user of suscriptedUsers) {
-        toNotify[user?.id] = { domain: user.mail, username: user.name, internships: new Set() };
-
-        const userSuscriptedCareers = new Set<string>();
-
-        // Iterate through the universities and extract all the careers the user is suscripted to
-        for (const university of user.careers) {
-          for (const career of university.careers) {
-            userSuscriptedCareers.add(career.id);
-          }
-        }
-
-        // Look for matches between the new careers and the ones that the user is intersted at
-        for (const internship of internships) {
-          const internshipCareers = new Set(internship.careers);
-
-          const matchCareers = userSuscriptedCareers.intersection(internshipCareers);
-
-          if (matchCareers.size > 0) {
-            toNotify[user?.id]?.internships?.add(internship.id);
-          }
-        }
-      }
-
-      // Create all the notifications
-      const arrayToNotify = Object.entries(toNotify).map(([key, value]) => {
-        return { userId: key, domain: value.domain, username: value.username, internships: Array.from(value.internships).map(String) };
-      });
+      const toNotify = this.getToNotifyUsers(internships, suscriptedUsers);
 
       // Notify all the intersted users
       const notificator = new NotificationService();
 
-      await notificator.notify(arrayToNotify);
+      await notificator.notify(toNotify);
 
       // Create web notifications
-      for (let data of arrayToNotify) {
+      for (let data of toNotify) {
         const userId = data.userId;
         const userInternships = data.internships.map(Number);
 
@@ -106,5 +76,41 @@ export class CronController {
     }
 
     return { careersSet, keywordsSet };
+  }
+
+  getToNotifyUsers(internships: Array<Internship & { careers: Array<string> }>, suscriptedUsers: Array<User & { careers: Array<{ university: any; careers: Array<{ id: string; name: string }> }> }>) {
+    // Associate suscripted users with all the internships that matches and need notification
+    const toNotify = {} as { [key: string]: { domain: string; username: string; internships: Set<number> } };
+
+    for (const user of suscriptedUsers) {
+      toNotify[user?.id] = { domain: user.mail, username: user.name, internships: new Set() };
+
+      const userSuscriptedCareers = new Set<string>();
+
+      // Iterate through the universities and extract all the careers the user is suscripted to
+      for (const university of user.careers) {
+        for (const career of university.careers) {
+          userSuscriptedCareers.add(career.id);
+        }
+      }
+
+      // Look for matches between the new careers and the ones that the user is intersted at
+      for (const internship of internships) {
+        const internshipCareers = new Set(internship.careers);
+
+        const matchCareers = userSuscriptedCareers.intersection(internshipCareers);
+
+        if (matchCareers.size > 0) {
+          toNotify[user?.id]?.internships?.add(internship.id);
+        }
+      }
+    }
+
+    // Create all the notifications
+    const arrayToNotify = Object.entries(toNotify).map(([key, value]) => {
+      return { userId: key, domain: value.domain, username: value.username, internships: Array.from(value.internships).map(String) };
+    });
+
+    return arrayToNotify;
   }
 }
