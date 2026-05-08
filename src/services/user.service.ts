@@ -13,7 +13,7 @@ export class UserService {
     const usersData = await this.userRepository.getSuscriptedUsers(careers, keywords);
 
     const users = usersData.map((user: any) => {
-      return this.mapUserToJson(user);
+      return this.mapUserToJson(user, false);
     });
 
     return users;
@@ -27,7 +27,7 @@ export class UserService {
 
       if (!user) return {} as User;
 
-      return this.mapUserToJson(user);
+      return this.mapUserToJson(user, true);
     } catch (e) {
       console.log(e);
       return {} as User;
@@ -151,31 +151,46 @@ export class UserService {
     }
   }
 
-  mapUserToJson(user: User & { userCareers?: Array<any>; userKeywords: Array<any> }) {
-    // Group careers based on its university
-    const universitiesMap = new Map<
-      string,
-      {
-        university: { id: string; name: string };
-        careers: { id: string; name: string; color: string; bg: string }[];
-      }
-    >();
+  mapUserToJson(user: User & { userCareers?: Array<any>; userKeywords: Array<any> }, hasUniversities: boolean = true) {
+    let careers;
 
-    for (const { Career } of user?.userCareers) {
-      for (const { University } of Career?.universityCareers) {
-        if (!universitiesMap.has(University?.id)) {
-          universitiesMap.set(University?.id, {
-            university: University,
-            careers: [],
-          });
+    // Group careers based on its university
+    if (hasUniversities) {
+      const universitiesMap = new Map<
+        string,
+        {
+          university: { id: string; name: string };
+          careers: { id: string; name: string; color: string; bg: string }[];
         }
-        universitiesMap.get(University.id)!.careers.push({
-          id: Career?.id,
-          name: Career?.name,
-          color: Career?.color,
-          bg: Career?.bg,
-        });
+      >();
+
+      if (user?.userCareers) {
+        for (const { Career } of user?.userCareers) {
+          for (const { University } of Career?.universityCareers) {
+            if (!universitiesMap.has(University?.id)) {
+              universitiesMap.set(University?.id, {
+                university: University,
+                careers: [],
+              });
+            }
+            universitiesMap.get(University.id)!.careers.push({
+              id: Career?.id,
+              name: Career?.name,
+              color: Career?.color,
+              bg: Career?.bg,
+            });
+          }
+        }
       }
+
+      careers = Array.from(universitiesMap.values());
+    } else {
+      careers =
+        user?.userCareers?.map((career) => ({
+          id: career?.career_id,
+          name: career?.Career?.name,
+          color: career?.Career?.color,
+        })) ?? [];
     }
 
     const newUser = {
@@ -183,7 +198,7 @@ export class UserService {
       name: user?.name,
       mail: user?.mail,
       suscripted: user?.suscripted,
-      careers: Array.from(universitiesMap.values()),
+      careers: careers,
       keywords:
         user?.userKeywords?.map((keyword) => {
           return keyword?.keyword;
