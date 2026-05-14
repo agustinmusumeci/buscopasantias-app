@@ -74,7 +74,7 @@ export default function Filter({ filter, isAuthenticated, loggedUser, hasNotific
           {...(isDesktop && { defaultValue: "filter" })}
         >
           <AccordionItem value="filter">
-            <AccordionTrigger>
+            <AccordionTrigger className="max-md:**:data-[slot=accordion-trigger-icon]:hidden">
               <div className="mb-0 text-lg font-medium flex flex-row gap-5 items-center border border-text rounded-full px-5 py-2 md:button md:button-outline md:px-0 md:py-0 md:border-none">
                 <ListFilter />
                 <p>Filtros</p>

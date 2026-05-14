@@ -453,8 +453,8 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                             value="careers"
                             className="w-full"
                           >
-                            <AccordionTrigger className="max-w-full!">
-                              <div className="flex flex-row items-center  justify-between w-full">
+                            <AccordionTrigger className=" flex max-w-full!">
+                              <div className=" flex flex-row items-center justify-between w-full">
                                 <span>{university?.name}</span>
                                 <span className="bg-neutral px-2 py-1 rounded-full">{university?.careers?.length}</span>
                               </div>
@@ -506,7 +506,7 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                             value="careers"
                             className="w-full"
                           >
-                            <AccordionTrigger className="max-w-full!">
+                            <AccordionTrigger className="flex max-w-full!">
                               <div className="flex flex-row items-center  justify-between w-full">
                                 <span>{el?.university?.name}</span>
                                 <span className="bg-neutral px-2 py-1 rounded-full">{el.careers.length}</span>

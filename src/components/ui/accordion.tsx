@@ -36,7 +36,7 @@ function AccordionTrigger({ className, children, ...props }: React.ComponentProp
         {...props}
       >
         {children}
-        <div className="hidden md:flex">
+        <div>
           <ChevronDownIcon
             data-slot="accordion-trigger-icon"
             className="pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
