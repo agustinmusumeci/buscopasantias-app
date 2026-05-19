@@ -90,7 +90,7 @@ export class InternshipService {
         color = TIME_SINCE_CREATED_COLORS.green;
         break;
 
-      case daysSince > 15 && daysSince <= 30:
+      case daysSince >= 15 && daysSince <= 30:
         // Yellow
         color = TIME_SINCE_CREATED_COLORS.yellow;
         break;

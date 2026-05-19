@@ -2,9 +2,7 @@ import type { InternshipWhereUniqueInput } from "prisma/generated/models";
 import type { Internship } from "../../prisma/zod";
 import { INTERNSHIPS_PER_PAGE } from "../constants/paginations";
 import prisma from "../lib/prisma";
-import dotenv from "dotenv";
 import { UTNScraper } from "@/services/utn.scraper.service";
-dotenv.config({ path: "/.env" });
 
 export class InternshipRepository {
   constructor() {}
