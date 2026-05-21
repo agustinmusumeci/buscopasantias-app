@@ -330,7 +330,7 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
               </AlertDialog>
             </div>
           </form>
-          <div className="bg-light-neutral/50 h-105 md:h-95 w-full mb-0 p-8 rounded-xl">
+          <div className="bg-light-neutral/50 h-130 md:h-95 w-full mb-0 p-8 rounded-xl">
             <div className="title-md flex flex-row  items-center">
               <div className="flex flex-col-reverse md:flex-row justify-between gap-4 items-start md:items-center w-full">
                 <button
@@ -346,11 +346,11 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                 </div>
               </div>
             </div>
-            <div className="h-65 flex flex-row gap-5 horizontal-scroll md:mt-6">
+            <div className="h-80 flex flex-row gap-5 horizontal-scroll md:mt-6">
               {alertedInternships?.map((internship) => (
                 <div
                   key={internship.internship.id}
-                  className="relative flex flex-col gap-5 bg-light-neutral text-text/75 p-5 min-w-100 h-65 rounded-xl"
+                  className="relative flex flex-col gap-5 bg-light-neutral text-text/75 p-5 min-w-97 h-74 rounded-xl"
                 >
                   <div>
                     <a
@@ -361,16 +361,16 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                         <div className="w-1 h-1 p-1 rounded-full bg-primary-hover"></div>
                         <h4 className="font-semibold text-lg truncate line-clamp-1">{internship.internship.position}</h4>
                       </div>
-                      <ArrowUpRight className="w-fit h-7" />
+                      <ArrowUpRight className="w-fit h-7 text-muted" />
                     </a>
                   </div>
                   <div className="flex flex-col gap-2 mb-9">
                     <p className="flex flex-row gap-2 items-center">
-                      <House className="text-text/50 w-4" />
+                      <House className="text-muted w-4" />
                       {internship.internship.company.name}
                     </p>
                     <p className="flex flex-row gap-2 items-center">
-                      <CircleDollarSign className="text-text/50 w-4" />
+                      <CircleDollarSign className="text-muted w-4" />
                       {typeof internship?.internship?.payment === "number" ? `$${internship?.internship?.payment?.toLocaleString()}` : internship.internship.payment}
                     </p>
                   </div>
@@ -428,7 +428,12 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
             <div className="flex flex-col gap-5">
               <div>
                 <div>
-                  <h3 className="title-md">Carreras</h3>
+                  <h3
+                    className="title-md"
+                    aria-disabled={!suscripted}
+                  >
+                    Carreras
+                  </h3>
                 </div>
                 <div
                   className="grid grid-cols-1 md:grid-cols-2 place-content-start gap-5 min-h-100"
@@ -468,11 +473,11 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                                   disabled={!suscripted}
                                   key={`available-careers-${career?.id}`}
                                   aria-disabled={!suscripted}
-                                  className="w-full mb-2 group flex flex-row gap-3 justify-between odd:bg-neutral/50 even:bg-neutral/25 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
+                                  className="w-full mb-2 group flex flex-row gap-3 justify-between bg-neutral/50 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
                                   style={{ color: `${career?.color}` }}
                                 >
                                   <span>{career?.name}</span>
-                                  <span className="text-xl text-text/20 group-hover:text-primary-hover transition-all">
+                                  <span className="text-xl text-muted group-hover:text-primary-hover transition-all">
                                     <CirclePlusIcon />
                                   </span>
                                 </button>
@@ -521,11 +526,11 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                                   disabled={!suscripted}
                                   key={`suscripted-careers-${career?.id}`}
                                   aria-disabled={!suscripted}
-                                  className="w-full mb-2 group flex flex-row gap-3 justify-between odd:bg-neutral/50 even:bg-neutral/25 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
+                                  className="w-full mb-2 group flex flex-row gap-3 justify-between bg-neutral/50 hover:bg-neutral transition-all items-center px-5 py-4 rounded-lg cursor-pointer"
                                   style={{ color: `${career.color}` }}
                                 >
                                   <span>{career.name}</span>
-                                  <span className="text-xl text-text/20 group-hover:text-red-800 transition-all">
+                                  <span className="text-xl text-muted group-hover:text-red-800 transition-all">
                                     <CircleX />
                                   </span>
                                 </button>
@@ -548,11 +553,19 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
               </div>
               <div className="mt-5">
                 <div>
-                  <h3 className="title-md">Filtros</h3>
+                  <h3
+                    className="title-md"
+                    aria-disabled={!suscripted}
+                  >
+                    Filtros
+                  </h3>
                 </div>
                 <div className="bg-light-neutral/50 h-fit md:h-fit w-full rounded-xl p-8">
                   <div className="flex flex-col gap-2 h-fit">
-                    <div className="title-sm flex flex-row gap-4 items-center">
+                    <div
+                      className="title-sm flex flex-row gap-4 items-center"
+                      aria-disabled={!suscripted}
+                    >
                       <KeyRound />
 
                       <h4>Palabras clave</h4>
@@ -602,14 +615,14 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                             key={`keywords-${k}-${i}`}
                           >
                             <p className="text-start mr-10">{k}</p>
-                            <CircleX className=" text-text/40 transition-all" />
+                            <CircleX className=" text-muted transition-all" />
                           </button>
                         ))}
                       </div>
 
                       {suscriptedKeywords?.length === 0 && (
                         <span className="group flex flex-row gap-3 justify-between odd:bg-neutral items-center px-5 py-4 rounded-lg cursor-pointer border-text/20 border-2 border-dotted">
-                          <span className="flex flex-row gap-5 text-xl text-text/40 items-center">
+                          <span className="flex flex-row gap-5 text-xl text-muted items-center">
                             <CirclePlusIcon />
                             Agregue palabras clave
                           </span>

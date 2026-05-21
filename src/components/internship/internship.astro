@@ -43,7 +43,7 @@ if (isAuthenticated  && loggedUser) {
                 <div class="mb-3 flex flex-col gap-2 bg-light-neutral p-10 rounded-xl">
                     <div class="relative">
                         <div class="flex flex-col gap-0 items-start">
-                            <span class="text-text/50 pb-5">A.R.M {internship?.arm}</span>
+                            <span class="text-muted pb-5">A.R.M {internship?.arm}</span>
                             <h2 class="text-3xl font-bold">{internship?.position}</h2>
                         </div>
                         {
@@ -56,17 +56,17 @@ if (isAuthenticated  && loggedUser) {
                     </div>
                     <div class="flex flex-col md:flex-row gap-5 md:gap-10 mb-3">
                         <div class="flex flex-col gap-3">
-                            <p class="flex flex-row gap-2"><House class="text-text/50 w-4"/> {internship?.modality}</p>
-                            <p class="flex flex-row gap-2"><MapPin class="text-text/50 w-4"/> {internship?.workplace}</p>
-                            <p class="flex flex-row gap-2"><CircleDollarSign class="text-text/50 w-4"/>{typeof internship?.payment === "number" ? `$${internship?.payment?.toLocaleString()}` : internship.payment}</p>
+                            <p class="flex flex-row gap-2"><House class="text-light-text w-4"/> {internship?.modality}</p>
+                            <p class="flex flex-row gap-2"><MapPin class="text-light-textd w-4"/> {internship?.workplace}</p>
+                            <p class="flex flex-row gap-2"><CircleDollarSign class="text-light-text w-4"/>{typeof internship?.payment === "number" ? `$${internship?.payment?.toLocaleString()}` : internship.payment}</p>
                         </div>
                         <div class="flex flex-col gap-3">
-                                <p class="flex flex-row gap-2"><UserRound class="text-text/50 w-4"/> {internship?.interns} Pasante/s</p>
-                                <p class="flex flex-row gap-2"><Building class="text-text/50 w-4"/> {internship?.company?.name}</p>
+                                <p class="flex flex-row gap-2"><UserRound class="text-light-text w-4"/> {internship?.interns} Pasante/s</p>
+                                <p class="flex flex-row gap-2"><Building class="text-light-text w-4"/> {internship?.company?.name}</p>
                         </div>  
                     </div>
                     <div class="flex flex-row items-center gap-2">
-                        <p><span class="text-text/50 ">Publicada el </span>{new Date(internship?.created_at).toLocaleDateString()}</p>
+                        <p><span class="text-muted ">Publicada el </span>{new Date(internship?.created_at).toLocaleDateString()}</p>
                         <span class="opacity-75 text-sm" style={`color: ${internship?.timeSinceCreated?.color}`}>({internship?.timeSinceCreated?.time})</span>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ if (isAuthenticated  && loggedUser) {
                                 Enviar Mail
                             </a>
                         </div>
-                        <div class="text-text/50">
+                        <div class="text-muted">
                             <p>Mail: {internship?.mail}</p>
                             <p class="text-wrap truncate hover:underline">Link: <a {...(internship?.link !== PLACEHOLDER.link && { href: internship?.link })} target="_blank">{internship?.link}</a></p>
                         </div>
