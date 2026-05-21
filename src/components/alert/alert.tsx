@@ -615,7 +615,7 @@ export default function Alert({ user, internships = [] }: { user: any; internshi
                             key={`keywords-${k}-${i}`}
                           >
                             <p className="text-start mr-10">{k}</p>
-                            <CircleX className=" text-muted transition-all" />
+                            <CircleX className="text-muted group-hover:text-red-800 transition-all" />
                           </button>
                         ))}
                       </div>
