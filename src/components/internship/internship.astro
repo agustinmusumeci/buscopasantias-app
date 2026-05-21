@@ -1,160 +1,212 @@
 ---
 import { MapPin, House, UserRound, Building, CircleDollarSign, Share, Copy, Bell, MoveRight, Bookmark } from "@lucide/astro";
-import { UserService } from "@/services/user.service";
 import Careers from "../career/careers.tsx";
 import SaveInternship from "./saveInternship.tsx";
 import Linkedin from "../svg/linkedin.astro";
 import X from "../svg/x.astro";
 import { PLACEHOLDER } from "@/constants/placeholders";
-import { InternshipService } from "@/services/internship.service";
 import SuscribeAlert from "../alert/suscribe";
-import NotFound from "../404/notFound.astro";
 
-const { id } = Astro.props;
-const referer = Astro.request.headers.get('Referer');
+const { internship, loggedUser = null, isAuthenticated = false, isInternshipSaved = false, hasNotifications = false } = Astro.props;
+
+const referer = Astro.request.headers.get("Referer");
 const url = referer ? new URL(referer) : Astro.url;
+// const referer = Astro.request.headers.get("Referer");
+// const url = referer ? new URL(referer) : Astro.url;
 
-const internshipService = new InternshipService()
-const internship = await internshipService.getInternship(Number(id)) ?? {}
+// const internshipService = new InternshipService();
+// const internship = (await internshipService.getInternship(Number(id))) ?? {};
 
-const notFound = (!internship || Object.entries(internship)?.length === 0) ? true : false
+// const notFound = !internship || Object.entries(internship)?.length === 0 ? true : false;
 
-const { isAuthenticated} = Astro.locals.auth()
-const loggedUser = await Astro.locals.currentUser()
+// const { isAuthenticated } = Astro.locals.auth();
+// const loggedUser = await Astro.locals.currentUser();
 
-let hasNotifications = false;
-let isInternshipSaved = false;
+// let hasNotifications = false;
+// let isInternshipSaved = false;
 
-if (isAuthenticated  && loggedUser) {
-    const userService = new UserService()
-    
-    const user = await userService.getUser(loggedUser?.id)
+// if (isAuthenticated && loggedUser) {
+//   const userService = new UserService();
 
-    isInternshipSaved = (await userService.getSavedInternships(user?.id, Number(id)))?.length > 0
-    hasNotifications = user?.suscripted ?? false
-}
+//   const user = await userService.getUser(loggedUser?.id);
+
+//   isInternshipSaved = (await userService.getSavedInternships(user?.id, Number(id)))?.length > 0;
+//   hasNotifications = user?.suscripted ?? false;
+// }
 ---
-{notFound ?
-    <NotFound title="!Ups! Lo sentimos" description="Parece que la pasantía que buscabas ya no existe o nunca existió" action="/internships" />
-    :
-    <>
-        <section class="mt-5 flex flex-col md:flex-row gap-5">
-            <article class="flex flex-col gap-3 w-full">
-                <div class="mb-3 flex flex-col gap-2 bg-light-neutral p-10 rounded-xl">
-                    <div class="relative">
-                        <div class="flex flex-col gap-0 items-start">
-                            <span class="text-muted pb-5">A.R.M {internship?.arm}</span>
-                            <h2 class="text-3xl font-bold">{internship?.position}</h2>
-                        </div>
-                        {
-                            (isAuthenticated && loggedUser) &&
-                            <SaveInternship internshipId={id} userId={loggedUser?.id} isInternshipSaved={isInternshipSaved} styles="absolute -top-2.5 -right-5" client:load/>
-                        }
-                    </div>
-                    <div class="mb-3">
-                        <Careers careers={internship?.careers}/>
-                    </div>
-                    <div class="flex flex-col md:flex-row gap-5 md:gap-10 mb-3">
-                        <div class="flex flex-col gap-3">
-                            <p class="flex flex-row gap-2"><House class="text-light-text w-4"/> {internship?.modality}</p>
-                            <p class="flex flex-row gap-2"><MapPin class="text-light-textd w-4"/> {internship?.workplace}</p>
-                            <p class="flex flex-row gap-2"><CircleDollarSign class="text-light-text w-4"/>{typeof internship?.payment === "number" ? `$${internship?.payment?.toLocaleString()}` : internship.payment}</p>
-                        </div>
-                        <div class="flex flex-col gap-3">
-                                <p class="flex flex-row gap-2"><UserRound class="text-light-text w-4"/> {internship?.interns} Pasante/s</p>
-                                <p class="flex flex-row gap-2"><Building class="text-light-text w-4"/> {internship?.company?.name}</p>
-                        </div>  
-                    </div>
-                    <div class="flex flex-row items-center gap-2">
-                        <p><span class="text-muted ">Publicada el </span>{new Date(internship?.created_at).toLocaleDateString()}</p>
-                        <span class="opacity-75 text-sm" style={`color: ${internship?.timeSinceCreated?.color}`}>({internship?.timeSinceCreated?.time})</span>
-                    </div>
-                </div>
-                    
-                <div class="flex flex-col gap-10 bg-light-neutral p-10 rounded-xl">
-                    <div>
-                        <div>
-                            <h3 class="title-md">Requisitos</h3>
-                            <p class="max-w-prose">{internship?.requirements} </p>
-                        </div>
-                        <br>
-                        <div>
-                            <h4 class="title-sm">Conocimientos necesarios</h4>
-                            <p >{internship?.knowledge}</p>
-                        </div>
-                    </div>  
-                    <div>
-                        <h3 class="title-md">Horarios</h3>
-                        <div class="flex flex-col gap-3">
-                            <div><span class="text-text/75">Entrevista: </span> <p>{internship?.interview_timetable}</p></div>
-                            <div><span class="text-text/75">Jornada: </span> <p>{internship?.timetable}</p></div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="title-md">Observaciones</h3>
-                        <div class="flex flex-col gap-3">
-                            <div><span class="text-text/75">Beneficios: </span> <p>{internship?.benefits}</p></div>
-                            <div><span class="text-text/75">Observaciones: </span> <p>{internship?.observations}</p> </div>
-                            <div><span class="text-text/75">Referente RRHH: </span> <p>{internship?.rrhh}</p></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex flex-row gap-2 mb-10">
-                            <a target="_blank" aria-disabled={internship?.link === PLACEHOLDER.link} class="button button-primary" {...(internship?.link !== PLACEHOLDER.link && { href: internship?.link })}>
-                                Solicitar
-                            </a>
-                            <a target="_blank" aria-disabled={internship?.mail === PLACEHOLDER.mail} class="button button-outline" {...(internship?.mail !== PLACEHOLDER.mail && { href: `mailto:${internship?.mail}` })} >
-                                Enviar Mail
-                            </a>
-                        </div>
-                        <div class="text-muted">
-                            <p>Mail: {internship?.mail}</p>
-                            <p class="text-wrap truncate hover:underline">Link: <a {...(internship?.link !== PLACEHOLDER.link && { href: internship?.link })} target="_blank">{internship?.link}</a></p>
-                        </div>
-                    </div>
-                </div>
-            </article>
-            <aside class="w-full md:w-fit h-fit flex flex-col gap-5">
-                <div class="bg-light-neutral rounded-xl p-9">
-                    <p class="text-lg font-bold mb-5">Comparte esta pasantía</p>
-                    <div class="flex flex-row gap-2">
-                        <button class="cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all" id="share-button"><Share/></button>
-                        <button class="cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all" id="clipboard-button"><Copy/></button>
-                        <a target="_blank" href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`} class="flex items-center cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all"><Linkedin /></a>
-                        <a target="_blank" href={`https://twitter.com/intent/tweet?text=En%20%22BuscoPasantias%22%20encontre%20la%20siguiente%20oferta%20para%20universitarios!&url=${url}`} class="flex items-center cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all"><X /></a>
-                    </div>
-                </div>
-                <SuscribeAlert careers={internship?.careers?.map((c: any) => {return c?.id}) ?? []} keyword="" isAuthenticated={isAuthenticated} loggedUser={loggedUser} hasNotifications={hasNotifications} styles="bg-light-neutral p-9 [&_.alert-content]:flex-row [&_.alert-content]:items-center [&_.alert-content]:gap-2" client:only />
-                
-            </aside>
-        </section>
-        <script>
-            const shareButton = document.getElementById("share-button")
-            const clipboardButton = document.getElementById("clipboard-button")
 
-            shareButton?.addEventListener("click", () => {
-                navigator
-            .share({
-                title: document.title,
-                text: 'Mira esta pasantia universitaria de "BuscoPasantías"',
-                url: window.location.href
-            })
-            .then(() => console.log('Successful share!'))
-            .catch(err => console.error(err));
-            })
+<section class="mt-5 flex flex-col md:flex-row gap-5">
+  <article class="flex flex-col gap-3 w-full">
+    <div class="mb-3 flex flex-col gap-2 bg-light-neutral p-10 rounded-xl">
+      <div class="relative">
+        <div class="flex flex-col gap-0 items-start">
+          <span class="text-muted pb-5">A.R.M {internship?.arm}</span>
+          <h2 class="text-3xl font-bold">{internship?.position}</h2>
+        </div>
+        {
+          isAuthenticated && (
+            <SaveInternship
+              internshipId={internship?.id}
+              userId={loggedUser?.id}
+              isInternshipSaved={isInternshipSaved}
+              styles="absolute -top-2.5 -right-5"
+              client:load
+            />
+          )
+        }
+      </div>
+      <div class="mb-3">
+        <Careers careers={internship?.careers} />
+      </div>
+      <div class="flex flex-col md:flex-row gap-5 md:gap-10 mb-3">
+        <div class="flex flex-col gap-3">
+          <p class="flex flex-row gap-2"><House class="text-light-text w-4" /> {internship?.modality}</p>
+          <p class="flex flex-row gap-2"><MapPin class="text-light-textd w-4" /> {internship?.workplace}</p>
+          <p class="flex flex-row gap-2"><CircleDollarSign class="text-light-text w-4" />{typeof internship?.payment === "number" ? `$${internship?.payment?.toLocaleString()}` : internship.payment}</p
+          >
+        </div>
+        <div class="flex flex-col gap-3">
+          <p class="flex flex-row gap-2"><UserRound class="text-light-text w-4" /> {internship?.interns} Pasante/s</p>
+          <p class="flex flex-row gap-2"><Building class="text-light-text w-4" /> {internship?.company?.name}</p>
+        </div>
+      </div>
+      <div class="flex flex-row items-center gap-2">
+        <p><span class="text-muted">Publicada el </span>{new Date(internship?.created_at).toLocaleDateString()}</p>
+        <span
+          class="opacity-75 text-sm"
+          style={`color: ${internship?.timeSinceCreated?.color}`}
+          >({internship?.timeSinceCreated?.time})</span
+        >
+      </div>
+    </div>
 
-            clipboardButton?.addEventListener("click", () => {
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    console.log('Internship copied to clipboard');
-                }).catch((err) => {
-                    console.error('Failed to copy: ', err);
-                })
-            })
+    <div class="flex flex-col gap-10 bg-light-neutral p-10 rounded-xl">
+      <div>
+        <div>
+          <h3 class="title-md">Requisitos</h3>
+          <p class="max-w-prose">{internship?.requirements} </p>
+        </div>
+        <br />
+        <div>
+          <h4 class="title-sm">Conocimientos necesarios</h4>
+          <p>{internship?.knowledge}</p>
+        </div>
+      </div>
+      <div>
+        <h3 class="title-md">Horarios</h3>
+        <div class="flex flex-col gap-3">
+          <div><span class="text-text/75">Entrevista: </span> <p>{internship?.interview_timetable}</p></div>
+          <div><span class="text-text/75">Jornada: </span> <p>{internship?.timetable}</p></div>
+        </div>
+      </div>
+      <div>
+        <h3 class="title-md">Observaciones</h3>
+        <div class="flex flex-col gap-3">
+          <div><span class="text-text/75">Beneficios: </span> <p>{internship?.benefits}</p></div>
+          <div><span class="text-text/75">Observaciones: </span> <p>{internship?.observations}</p> </div>
+          <div><span class="text-text/75">Referente RRHH: </span> <p>{internship?.rrhh}</p></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex flex-row gap-2 mb-10">
+          <a
+            target="_blank"
+            aria-disabled={internship?.link === PLACEHOLDER.link}
+            class="button button-primary"
+            {...internship?.link !== PLACEHOLDER.link && { href: internship?.link }}
+          >
+            Solicitar
+          </a>
+          <a
+            target="_blank"
+            aria-disabled={internship?.mail === PLACEHOLDER.mail}
+            class="button button-outline"
+            {...internship?.mail !== PLACEHOLDER.mail && { href: `mailto:${internship?.mail}` }}
+          >
+            Enviar Mail
+          </a>
+        </div>
+        <div class="text-muted">
+          <p>Mail: {internship?.mail}</p>
+          <p class="text-wrap truncate hover:underline"
+            >Link: <a
+              {...internship?.link !== PLACEHOLDER.link && { href: internship?.link }}
+              target="_blank"
+              >{internship?.link}</a
+            ></p
+          >
+        </div>
+      </div>
+    </div>
+  </article>
+  <aside class="w-full md:w-fit h-fit flex flex-col gap-5">
+    <div class="bg-light-neutral rounded-xl p-9">
+      <p class="text-lg font-bold mb-5">Comparte esta pasantía</p>
+      <div class="flex flex-row gap-2">
+        <button
+          class="cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all"
+          id="share-button"
+          ><Share /></button
+        >
+        <button
+          class="cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all"
+          id="clipboard-button"
+          ><Copy /></button
+        >
+        <a
+          target="_blank"
+          href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`}
+          class="flex items-center cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all"
+          ><Linkedin /></a
+        >
+        <a
+          target="_blank"
+          href={`https://twitter.com/intent/tweet?text=En%20%22BuscoPasantias%22%20encontre%20la%20siguiente%20oferta%20para%20universitarios!&url=${url}`}
+          class="flex items-center cursor-pointer hover:bg-neutral rounded-full px-3 py-2 transition-all"
+          ><X /></a
+        >
+      </div>
+    </div>
+    <SuscribeAlert
+      careers={internship?.careers?.map((c: any) => {
+        return c?.id;
+      }) ?? []}
+      keyword=""
+      isAuthenticated={isAuthenticated}
+      loggedUser={loggedUser}
+      hasNotifications={hasNotifications}
+      styles="bg-light-neutral p-9 [&_.alert-content]:flex-row [&_.alert-content]:items-center [&_.alert-content]:gap-2"
+      client:only
+    />
+  </aside>
+</section>
+<script>
+  const shareButton = document.getElementById("share-button");
+  const clipboardButton = document.getElementById("clipboard-button");
 
-            function saveInternship(internshipId: number, userId: string) {
-                console.log(internshipId, userId)
-            }
-        </script>
-    </>
-}
+  shareButton?.addEventListener("click", () => {
+    navigator
+      .share({
+        title: document.title,
+        text: 'Mira esta pasantia universitaria de "BuscoPasantías"',
+        url: window.location.href,
+      })
+      .then(() => console.log("Successful share!"))
+      .catch((err) => console.error(err));
+  });
 
+  clipboardButton?.addEventListener("click", () => {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => {
+        console.log("Internship copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  });
+
+  function saveInternship(internshipId: number, userId: string) {
+    console.log(internshipId, userId);
+  }
+</script>

@@ -17,6 +17,7 @@
   "dependencies": {
     "@astrojs/preact": "^5.0.2",
     "@astrojs/react": "^5.0.2",
+    "@astrojs/sitemap": "^3.7.2",
     "@astrojs/vercel": "^10.0.2",
     "@clerk/astro": "^3.0.6",
     "@clerk/localizations": "^4.2.3",

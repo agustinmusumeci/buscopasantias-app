@@ -1,18 +1,54 @@
 ---
-import InternshipSkeleton from "@/components/internship/internshipSkeleton.astro";
 import Internship from "../../components/internship/internship.astro";
 import Layout from "../../layouts/Layout.astro";
+import { UserService } from "@/services/user.service";
+import { InternshipService } from "@/services/internship.service";
+import NotFound from "@/components/404/notFound.astro";
 
 const { id } = Astro.params;
+
+const internshipService = new InternshipService();
+const internship = (await internshipService.getInternship(Number(id))) ?? {};
+
+const notFound = !internship || Object.entries(internship)?.length === 0 ? true : false;
+
+const { isAuthenticated } = Astro.locals.auth();
+const loggedUser = await Astro.locals.currentUser();
+
+let hasNotifications = false;
+let isInternshipSaved = false;
+
+if (isAuthenticated && loggedUser) {
+  const userService = new UserService();
+
+  const user = await userService.getUser(loggedUser?.id);
+
+  isInternshipSaved = (await userService.getSavedInternships(user?.id, Number(id)))?.length > 0;
+  hasNotifications = user?.suscripted ?? false;
+}
 ---
 
-<Layout title={`Pasantia ${id} | BuscoPasantías`}>
+<Layout
+  title={`${notFound ? "Pasantía no encontrada" : `${internship?.position ?? `Pasantía ${id}`}`} | BuscoPasantías`}
+  description={internship?.knowledge}
+>
   <section class="container mb-10">
-    <Internship
-      id={id}
-      server:defer
-    >
-      <InternshipSkeleton slot="fallback" />
-    </Internship>
+    {
+      notFound ? (
+        <NotFound
+          title="!Ups! Lo sentimos"
+          description="Parece que la pasantía que buscabas ya no existe o nunca existió"
+          action="/internships"
+        />
+      ) : (
+        <Internship
+          internship={internship}
+          loggedUser={loggedUser}
+          hasNotifications={hasNotifications}
+          isInternshipSaved={isInternshipSaved}
+          isAuthenticated={isAuthenticated}
+        />
+      )
+    }
   </section>
 </Layout>

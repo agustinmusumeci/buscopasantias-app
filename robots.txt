@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /terms
+
+Sitemap: https://buscopasantias.com/sitemap.xml

@@ -1,55 +1,102 @@
 ---
-import "../styles/global.css"
+import "../styles/global.css";
 import { UserService } from "@/services/user.service";
 import Header from "@/components/header/header.astro";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
+import buscoPasantiasImage from "../../public/icons/favicon.svg";
 import Footer from "@/components/footer/footer.astro";
 
 type Props = {
-	title?: string
-	description?: string
-}
+  title?: string;
+  description?: string;
+  image?: string;
+};
 
-const defaultTitle = "BuscoPasantías"
-const defaultDescription = "¡Te damos la bienvenida a BuscoPasantías! · Somos una aplicación que te facilita encontrar pasantías universitarias y alertarte de nuevas oportunidades según tus preferencias · Descubre las mejores oportunidades."
+const defaultTitle = "BuscoPasantías";
+const defaultDescription =
+  "¡Te damos la bienvenida a BuscoPasantías! · Somos una aplicación que te facilita encontrar pasantías universitarias y alertarte de nuevas oportunidades según tus preferencias · Descubre las mejores oportunidades.";
+const { title = defaultTitle, description = defaultDescription, image = "https://www.buscopasantias.com.ar/icons/favicon.svg" } = Astro.props as Props;
 
-const {title = defaultTitle, description = defaultDescription} = Astro.props as Props
-
-
-const user = await Astro.locals.currentUser()
+const user = await Astro.locals.currentUser();
 
 if (user) {
-	const userId = user?.id
-	const name = user?.fullName ?? "";
-	const mail = user?.primaryEmailAddress?.emailAddress ?? ""
-	
-	const userService = new UserService()
+  const userId = user?.id;
+  const name = user?.fullName ?? "";
+  const mail = user?.primaryEmailAddress?.emailAddress ?? "";
 
-	await userService.syncUser(userId, name, mail)
+  const userService = new UserService();
+
+  await userService.syncUser(userId, name, mail);
 }
 ---
+
 <!doctype html>
 <html lang="es-AR">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width"
+    />
 
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<meta name="description" content={description}>
-		<link rel="shortcut icon" href="/icons/favicon.svg" type="image/x-icon">
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
-	</head>
-	<body class="min-h-dvh">
-		<Header />
-		<main class="min-h-dvh">
-			<slot />
-		</main>
+    <meta
+      name="generator"
+      content={Astro.generator}
+    />
+    <title>{title}</title>
+    <meta
+      name="description"
+      content={description}
+    />
 
-		<Footer />
+    <meta
+      property="og:title"
+      content={title}
+    />
+    <meta
+      property="og:description"
+      content={description}
+    />
+    <meta
+      property="og:image"
+      content={image}
+    />
+    <meta
+      property="og:url"
+      content="https://buscopasantias.com.ar/"
+    />
+    <link
+      rel="shortcut icon"
+      href="/icons/favicon.svg"
+      type="image/x-icon"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <meta
+      name="google-site-verification"
+      content="uGqNC1O6ceelus064JfYpbfDZW9n1UEWdgMneHfIOQY"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Space+Grotesk:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-dvh">
+    <Header />
 
-		<Toaster client:only/>
-	</body>
+    <main class="min-h-dvh">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <Toaster client:only />
+  </body>
 </html>
